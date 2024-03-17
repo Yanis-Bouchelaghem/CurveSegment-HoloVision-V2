@@ -47,6 +47,11 @@ std::vector<cv::Mat> Video::LoadVideo(cv::ImreadModes readMode) const
 	return video;
 }
 
+void Video::TruncateFrameCount(int count)
+{
+	frames.resize(count);
+}
+
 DatasetLoader::DatasetLoader(std::string folderPath)
 
 {
@@ -72,6 +77,14 @@ DatasetLoader::DatasetLoader(std::string folderPath)
 int DatasetLoader::GetVideoCount() const
 {
 	return videos.size();
+}
+
+void DatasetLoader::TruncateFrameCountToMin()
+{
+	for (auto& video : videos)
+	{
+		video.TruncateFrameCount(minimumFrameCount);
+	}
 }
 
 std::vector<cv::Mat> DatasetLoader::LoadVideo(int index, cv::ImreadModes readMode) const

@@ -3,6 +3,8 @@
 int main()
 {
 	DatasetLoader datasetLoader("dataset");
+	datasetLoader.TruncateFrameCountToMin();
+
 	{
 		std::vector<std::vector<cv::Mat>> videos;
 		for (int i = 0; i < datasetLoader.GetVideoCount(); ++i)

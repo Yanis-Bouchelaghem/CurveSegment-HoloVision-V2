@@ -7,6 +7,7 @@
 class Frame
 {
 public:
+	Frame() = default;
 	Frame(std::string framePath);
 	cv::Mat LoadFrame(cv::ImreadModes readMode) const;
 private:
@@ -19,6 +20,7 @@ public:
 	Video(std::string videoPath);
 	std::vector<cv::Mat> LoadVideo(cv::ImreadModes readMode) const;
 	int GetFrameCount() const;
+	void TruncateFrameCount(int count);
 private:
 	std::vector<Frame> frames; 
 };
@@ -30,6 +32,7 @@ public:
 	DatasetLoader(std::string folderPath);
 	int GetVideoCount() const;
 	std::vector<cv::Mat> LoadVideo(int index, cv::ImreadModes readMode) const;
+	void TruncateFrameCountToMin();
 private:
 	std::vector<Video> videos;
 	int maximumFrameCount;
