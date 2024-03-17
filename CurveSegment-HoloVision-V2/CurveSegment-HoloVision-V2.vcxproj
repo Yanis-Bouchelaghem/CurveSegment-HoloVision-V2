@@ -133,9 +133,14 @@
   <ItemGroup>
     <ClCompile Include="DatasetLoader.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="RandomWalk.cpp" />
+    <ClCompile Include="VideoProcessor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DatasetLoader.h" />
+    <ClInclude Include="RandomWalk.h" />
+    <ClInclude Include="vec2.h" />
+    <ClInclude Include="VideoProcessor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
