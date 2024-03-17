@@ -10,6 +10,11 @@ Frame::Frame(std::string framePath)
 	assert(!absolutePath.empty()); //If assertion triggers : frame was not found.
 }
 
+cv::Mat Frame::LoadFrame(cv::ImreadModes readMode) const
+{
+	return cv::imread(absolutePath, readMode);
+}
+
 Video::Video(std::string videoPath)
 {
 	std::vector<std::string> framePaths;
@@ -29,6 +34,17 @@ Video::Video(std::string videoPath)
 int Video::GetFrameCount() const
 {
 	return frames.size();
+}
+
+std::vector<cv::Mat> Video::LoadVideo(cv::ImreadModes readMode) const
+{
+	std::vector<cv::Mat> video;
+	video.reserve(GetFrameCount());
+	for (auto& frame : frames)
+	{
+		video.push_back(frame.LoadFrame(readMode));
+	}
+	return video;
 }
 
 DatasetLoader::DatasetLoader(std::string folderPath)
@@ -51,6 +67,16 @@ DatasetLoader::DatasetLoader(std::string folderPath)
 												   [](const Video& lhs, const Video& rhs){return lhs.GetFrameCount() < rhs.GetFrameCount();});
 	minimumFrameCount = (*shortestLongestPair.first).GetFrameCount();
 	maximumFrameCount = (*shortestLongestPair.second).GetFrameCount();
+}
+
+int DatasetLoader::GetVideoCount() const
+{
+	return videos.size();
+}
+
+std::vector<cv::Mat> DatasetLoader::LoadVideo(int index, cv::ImreadModes readMode) const
+{
+	return videos[index].LoadVideo(readMode);
 }
 
 
