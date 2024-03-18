@@ -3,11 +3,13 @@
 #include <filesystem>
 
 VideoProcessor::VideoProcessor(const std::vector<cv::Mat>& video,
+							   int videoIndex,
 							   const cv::Mat& hologramMask,
 							   const RandomWalk& randomWalk,
 							   float segmentThreshold)
 	:
 	video(video),
+	videoIndex(videoIndex),
 	hologramMask(hologramMask),
 	randomWalk(randomWalk),
 	segmentThreshold(segmentThreshold)
@@ -20,6 +22,7 @@ void VideoProcessor::GenerateImagesFromSegments(std::string outputFolder, int ho
 {
 	//Create the target folders if they do not exist
 	std::filesystem::create_directory(outputFolder);
+	std::filesystem::create_directory(outputFolder+"/segments");
 	std::filesystem::create_directory(outputFolder+"/holo");
 	std::filesystem::create_directory(outputFolder+"/non-holo");
 	//As long as we haven't reached the target numbers, keep generating segments
@@ -31,17 +34,22 @@ void VideoProcessor::GenerateImagesFromSegments(std::string outputFolder, int ho
 		std::vector<Vec2<int>> curveSegment = randomWalk.GenerateCurveSegment(segmentLength);
 		//Determine whether it is intersecting with the hologram
 		bool isIntersectingHologram = IsSegmentIntersectingHologram(curveSegment);
-		IsSegmentIntersectingHologram(curveSegment);
 		//Generate the evolution image in the correctly labeled folder
 		cv::Mat generatedImage = GenerateImageFromSegment(curveSegment);
+		std::stringstream outputPath;
 		if (isIntersectingHologram && hologramCount < hologramTarget)
 		{ 
-			cv::imwrite(outputFolder + "/holo/" + std::to_string(hologramCount) + ".png", generatedImage);
+
+			outputPath << outputFolder << "/holo/vid" << videoIndex << "_seg" << hologramCount << ".png";
+			cv::imwrite(outputPath.str(), generatedImage);
+			//TODO : generate the curve on an image and save it in a different folder
 			++hologramCount;
 		}
 		else if(nonHologramCount < nonHologramTarget)
 		{
-			cv::imwrite(outputFolder + "/non-holo/" + std::to_string(nonHologramCount) + ".png", generatedImage);
+
+			outputPath << outputFolder << "/non-holo/vid" << videoIndex << "_seg" << hologramCount << ".png";
+			cv::imwrite(outputPath.str(), generatedImage);
 			++nonHologramCount;
 		}
 

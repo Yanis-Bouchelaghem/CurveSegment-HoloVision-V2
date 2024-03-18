@@ -13,7 +13,7 @@ int main()
 	//TODO : Load mask, with the goal of testing the curve segment labelisation.
 	cv::Mat passport_hologram_mask = utils::LoadImage("passport_hologram_mask.png", cv::IMREAD_GRAYSCALE);
 	auto video = datasetLoader.LoadVideo(1, cv::IMREAD_COLOR);
-	VideoProcessor videoProcessor(video, passport_hologram_mask, randomWalk, settings::segmentThreshold);
+	VideoProcessor videoProcessor(video, 1, passport_hologram_mask, randomWalk, settings::segmentThreshold);
 	videoProcessor.GenerateImagesFromSegments("generatedImages", targetHoloCountPerVideo, targetNonHoloCountPerVideo, segmentLength);
 
 	return 0;
