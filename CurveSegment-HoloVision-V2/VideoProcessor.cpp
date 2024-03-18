@@ -6,13 +6,15 @@ VideoProcessor::VideoProcessor(const std::vector<cv::Mat>& video,
 							   int videoIndex,
 							   const cv::Mat& hologramMask,
 							   const RandomWalk& randomWalk,
-							   float segmentThreshold)
+							   float segmentThreshold,
+							   bool visualizeSegments)
 	:
 	video(video),
 	videoIndex(videoIndex),
 	hologramMask(hologramMask),
 	randomWalk(randomWalk),
-	segmentThreshold(segmentThreshold)
+	segmentThreshold(segmentThreshold),
+	visualizeSegments(visualizeSegments)
 {
 	assert(video[0].rows == randomWalk.GetHeight()); //If assertion triggers : The dimensions of the frames does not match
 	assert(video[0].cols == randomWalk.GetWidth());  //the dimensions given in the settings file.
@@ -22,9 +24,13 @@ void VideoProcessor::GenerateImagesFromSegments(std::string outputFolder, int ho
 {
 	//Create the target folders if they do not exist
 	std::filesystem::create_directory(outputFolder);
-	std::filesystem::create_directory(outputFolder+"/segments");
-	std::filesystem::create_directory(outputFolder + "/segments/holo");
-	std::filesystem::create_directory(outputFolder + "/segments/non-holo");
+	if (visualizeSegments)
+	{
+		std::filesystem::create_directory(outputFolder + "/segments");
+		std::filesystem::create_directory(outputFolder + "/segments/holo");
+		std::filesystem::create_directory(outputFolder + "/segments/non-holo");
+	}
+
 	std::filesystem::create_directory(outputFolder+"/holo");
 	std::filesystem::create_directory(outputFolder+"/non-holo");
 	//As long as we haven't reached the target numbers, keep generating segments
@@ -44,21 +50,31 @@ void VideoProcessor::GenerateImagesFromSegments(std::string outputFolder, int ho
 		{ 
 
 			outputPath << outputFolder << "/holo/vid" << videoIndex << "_seg" << hologramCount << ".png";
-			segmentOutputPath << outputFolder << "/segments/holo/vid" << videoIndex << "_seg" << hologramCount << ".png";
 			cv::imwrite(outputPath.str(), generatedImage);
-			// generate the curve on an image and save it in a different folder
-			cv::Mat firstFrameWithSegment = DrawSegmentOnFirstFrame(curveSegment);
-			cv::imwrite(segmentOutputPath.str(), firstFrameWithSegment);
+
+			if (visualizeSegments)
+			{
+				// generate the curve on an image and save it in a different folder
+				segmentOutputPath << outputFolder << "/segments/holo/vid" << videoIndex << "_seg" << hologramCount << ".png";
+				cv::Mat firstFrameWithSegment = DrawSegmentOnFirstFrame(curveSegment);
+				cv::imwrite(segmentOutputPath.str(), firstFrameWithSegment);
+			}
 			++hologramCount;
+
 		}
 		else if(nonHologramCount < nonHologramTarget)
 		{
 			outputPath << outputFolder << "/non-holo/vid" << videoIndex << "_seg" << nonHologramCount << ".png";
-			segmentOutputPath << outputFolder << "/segments/non-holo/vid" << videoIndex << "_seg" << nonHologramCount << ".png";
 			cv::imwrite(outputPath.str(), generatedImage);
-			cv::Mat firstFrameWithSegment = DrawSegmentOnFirstFrame(curveSegment);
-			cv::imwrite(segmentOutputPath.str(), firstFrameWithSegment);
+
+			if (visualizeSegments)
+			{
+				segmentOutputPath << outputFolder << "/segments/non-holo/vid" << videoIndex << "_seg" << nonHologramCount << ".png";
+				cv::Mat firstFrameWithSegment = DrawSegmentOnFirstFrame(curveSegment);
+				cv::imwrite(segmentOutputPath.str(), firstFrameWithSegment);
+			}
 			++nonHologramCount;
+
 		}
 
 	}
