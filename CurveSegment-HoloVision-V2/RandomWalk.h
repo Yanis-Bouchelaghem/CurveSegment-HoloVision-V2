@@ -16,6 +16,8 @@ public:
 public:
 	RandomWalk(int height, int width);
 	std::vector<Vec2<int>> GenerateCurveSegment(int length) const;
+	int GetHeight() const;
+	int GetWidth() const;
 private:
 	//Returns the given position after performing a step in the given direction.
 	Vec2<int> Step(const Vec2<int>& currentPosition, Direction direction) const;

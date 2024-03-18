@@ -7,6 +7,10 @@
 
 # The images dataset
 dataset
+#The generated images
+generatedImages
+#Any kind of jpg image
+*.jpg
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

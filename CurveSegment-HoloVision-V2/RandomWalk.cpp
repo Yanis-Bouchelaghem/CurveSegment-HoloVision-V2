@@ -14,7 +14,7 @@ std::vector<Vec2<int>> RandomWalk::GenerateCurveSegment(int length) const
 {
 	//Start at a random position in the image
 	std::vector<Vec2<int>> curveSegment;
-	Vec2<int> currentPosition{heightDistribution(rng), widthDistribution(rng)};
+	Vec2<int> currentPosition{widthDistribution(rng), heightDistribution(rng) };
 	curveSegment.emplace_back(currentPosition);
 
 	for (int i = 1; i < length; ++i)
@@ -25,6 +25,16 @@ std::vector<Vec2<int>> RandomWalk::GenerateCurveSegment(int length) const
 	}
 
 	return curveSegment;
+}
+
+int RandomWalk::GetHeight() const
+{
+	return height;
+}
+
+int RandomWalk::GetWidth() const
+{
+	return width;
 }
 
 Vec2<int> RandomWalk::Step(const Vec2<int>& currentPosition,Direction direction) const
