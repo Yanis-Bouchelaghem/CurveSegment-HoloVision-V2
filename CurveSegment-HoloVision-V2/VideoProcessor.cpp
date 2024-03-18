@@ -23,6 +23,8 @@ void VideoProcessor::GenerateImagesFromSegments(std::string outputFolder, int ho
 	//Create the target folders if they do not exist
 	std::filesystem::create_directory(outputFolder);
 	std::filesystem::create_directory(outputFolder+"/segments");
+	std::filesystem::create_directory(outputFolder + "/segments/holo");
+	std::filesystem::create_directory(outputFolder + "/segments/non-holo");
 	std::filesystem::create_directory(outputFolder+"/holo");
 	std::filesystem::create_directory(outputFolder+"/non-holo");
 	//As long as we haven't reached the target numbers, keep generating segments
@@ -37,19 +39,25 @@ void VideoProcessor::GenerateImagesFromSegments(std::string outputFolder, int ho
 		//Generate the evolution image in the correctly labeled folder
 		cv::Mat generatedImage = GenerateImageFromSegment(curveSegment);
 		std::stringstream outputPath;
+		std::stringstream segmentOutputPath;
 		if (isIntersectingHologram && hologramCount < hologramTarget)
 		{ 
 
 			outputPath << outputFolder << "/holo/vid" << videoIndex << "_seg" << hologramCount << ".png";
+			segmentOutputPath << outputFolder << "/segments/holo/vid" << videoIndex << "_seg" << hologramCount << ".png";
 			cv::imwrite(outputPath.str(), generatedImage);
-			//TODO : generate the curve on an image and save it in a different folder
+			// generate the curve on an image and save it in a different folder
+			cv::Mat firstFrameWithSegment = DrawSegmentOnFirstFrame(curveSegment);
+			cv::imwrite(segmentOutputPath.str(), firstFrameWithSegment);
 			++hologramCount;
 		}
 		else if(nonHologramCount < nonHologramTarget)
 		{
-
-			outputPath << outputFolder << "/non-holo/vid" << videoIndex << "_seg" << hologramCount << ".png";
+			outputPath << outputFolder << "/non-holo/vid" << videoIndex << "_seg" << nonHologramCount << ".png";
+			segmentOutputPath << outputFolder << "/segments/non-holo/vid" << videoIndex << "_seg" << nonHologramCount << ".png";
 			cv::imwrite(outputPath.str(), generatedImage);
+			cv::Mat firstFrameWithSegment = DrawSegmentOnFirstFrame(curveSegment);
+			cv::imwrite(segmentOutputPath.str(), firstFrameWithSegment);
 			++nonHologramCount;
 		}
 
@@ -81,4 +89,14 @@ cv::Mat VideoProcessor::GenerateImageFromSegment(const std::vector<Vec2<int>>& c
 		}
 	}
 	return curveSegmentResult;
+}
+
+cv::Mat VideoProcessor::DrawSegmentOnFirstFrame(const std::vector<Vec2<int>>& curveSegment) const
+{
+	cv::Mat firstFrame = video[0].clone();
+	for (const Vec2<int>& position : curveSegment)
+	{
+		firstFrame.at<cv::Vec3b>(position.y, position.x) = cv::Vec3b(0, 0, 255);
+	}
+	return firstFrame;
 }

@@ -14,6 +14,7 @@ public:
 private:
 	bool IsSegmentIntersectingHologram(const std::vector<Vec2<int>>& curveSegment) const;
 	cv::Mat GenerateImageFromSegment(const std::vector<Vec2<int>>& curveSegment) const;
+	cv::Mat DrawSegmentOnFirstFrame(const std::vector<Vec2<int>>& curveSegment) const;
 private:
 	const std::vector<cv::Mat>& video;
 	const int videoIndex;
